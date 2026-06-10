@@ -6,7 +6,6 @@
 !/so101_ws/src/so101_ros2
 /third_party/*
 !/third_party/lerobot
-/docker/Dockerfile
 /outputs
 /calibration
 /isaac_so101
