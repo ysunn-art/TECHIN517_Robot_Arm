@@ -1,0 +1,29 @@
+# Rosetta Client Node Parameters — SmolVLA policies.
+# Copy of rosetta_client.yaml with policy_type=smolvla. Use this for any policy
+# trained as SmolVLA (the data/*/policy_smolvla checkpoints):
+#
+#   ros2 launch rosetta rosetta_client_launch.py \
+#       params_file:=<this file> \
+#       contract_path:=... pretrained_name_or_path:=.../policy_smolvla/.../pretrained_model
+#
+# The default rosetta_client.yaml stays policy_type=act for the ACT policies
+# (deal_face_up, pay_out_chip ACT checkpoints).
+
+rosetta_client:
+  ros__parameters:
+    pretrained_name_or_path: "iblnk/act-turtlebot3_demo"
+    server_address: "127.0.0.1:8080"
+    policy_type: "smolvla"
+    policy_device: "cuda"
+    # Match lerobot-record's loop: policy has n_action_steps=chunk_size=50, so
+    # lerobot predicts 50, executes ALL 50 (~1.67s @ 30Hz), then re-infers.
+    # Replicate that: only request a new chunk when the queue is empty (0.0) and
+    # replace rather than blend (latest_only). Blending (weighted_average) drifted
+    # right; re-requesting mid-chunk (0.5) made latest_only restart and stall.
+    actions_per_chunk: 50
+    chunk_size_threshold: 0.0
+    aggregate_fn_name: "latest_only"
+    feedback_rate_hz: 2.0
+    launch_local_server: true
+    obs_similarity_atol: -1.0
+    sim_time_multiplier: 1.0

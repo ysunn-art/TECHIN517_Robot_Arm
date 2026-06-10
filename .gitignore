@@ -1,0 +1,49 @@
+/so101_ws/src/*
+/so101_ws/log
+/so101_ws/build
+/so101_ws/install
+/soa_ws/
+!/so101_ws/src/so101_ros2
+/third_party/*
+!/third_party/lerobot
+/docker/Dockerfile
+/outputs
+/calibration
+/isaac_so101
+/answers
+/archive
+/huggingface/*
+!/huggingface/README.md
+CLAUDE.md
+.claude
+HUMBLE*
+JAZZY*
+OLD*
+WORKING*
+working*
+BACK*
+logs
+lab_materials/
+
+# Build artifacts and compilation
+build/
+install/
+log/
+logs/
+
+# Training data and models
+data/
+*.safetensors
+*.parquet
+*.mp4
+*.pth
+*.pt
+
+# Python cache
+__pycache__/
+*.pyc
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/

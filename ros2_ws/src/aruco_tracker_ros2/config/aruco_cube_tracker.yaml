@@ -1,0 +1,16 @@
+aruco_cube_tracker:
+  ros__parameters:
+    image_topics:
+      - "/follower/wrist_cam/image_raw"
+      - "/static_camera/overhead_cam/color/image_raw"
+    camera_info_topics:
+      - "/follower/wrist_cam/camera_info"
+      - "/static_camera/overhead_cam/color/camera_info"
+    camera_names:
+      - "wrist_cam"
+      - "overhead_cam"
+    marker_size: 0.02
+    cube_size: 0.03
+    aruco_dictionary: 0  # DICT_4X4_50
+    cube_frame_id: "aruco_cube"
+    publish_debug_images: true

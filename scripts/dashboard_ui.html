@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Blackjack — Table View</title>
+<style>
+  :root{
+    --felt-1:#0b5d3b; --felt-2:#063d27; --gold:#e8c66b; --gold-dim:#9c8540;
+    --red:#d8423a; --ink:#15110a; --cream:#f5ecd6;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; font-family:"Georgia","Times New Roman",serif; color:var(--cream);
+    background:radial-gradient(ellipse at 50% 38%, var(--felt-1) 0%, var(--felt-2) 70%, #042018 100%);
+    overflow:hidden;
+  }
+  .table{
+    display:grid; grid-template-columns:1fr; grid-template-rows:1fr;
+    height:100vh; width:100vw;
+  }
+  /* ---- main play area ---- */
+  .play{position:relative; display:flex; flex-direction:column; padding:22px 28px;}
+  .brand{
+    position:absolute; top:14px; left:50%; transform:translateX(-50%);
+    font-size:15px; letter-spacing:7px; color:var(--gold); text-transform:uppercase;
+    opacity:.85; text-shadow:0 1px 0 #000;
+  }
+  .brand small{display:block;text-align:center;letter-spacing:3px;font-size:9px;color:var(--gold-dim);margin-top:3px}
+
+  .side{flex:1; display:flex; flex-direction:column; justify-content:center; gap:10px;}
+  .side.dealer{justify-content:flex-start; padding-top:54px;}
+  .side.player{justify-content:flex-end; padding-bottom:18px;}
+
+  .label-row{display:flex; align-items:center; gap:14px;}
+  .who{
+    font-size:13px; letter-spacing:5px; text-transform:uppercase; color:var(--gold);
+    min-width:96px;
+  }
+  .total{
+    font-size:20px; min-width:54px; height:38px; padding:0 12px;
+    display:inline-flex; align-items:center; justify-content:center;
+    border:1px solid var(--gold-dim); border-radius:20px; background:rgba(0,0,0,.28);
+    color:var(--cream); letter-spacing:1px;
+  }
+  .total.bust{color:var(--red); border-color:var(--red); box-shadow:0 0 14px rgba(216,66,58,.5)}
+  .total.bj{color:#ffe9a8; border-color:var(--gold); box-shadow:0 0 16px rgba(232,198,107,.55)}
+
+  .hand{display:flex; gap:14px; min-height:148px; align-items:center; flex-wrap:wrap;}
+
+  .card{
+    width:100px; height:142px; border-radius:10px; position:relative; flex:0 0 auto;
+    background:linear-gradient(160deg,#fffdf6,#efe6cf);
+    box-shadow:0 10px 22px rgba(0,0,0,.45), inset 0 0 0 1px rgba(0,0,0,.06);
+    color:var(--ink); animation:deal .45s cubic-bezier(.2,.8,.25,1) both;
+    transform-origin:bottom center;
+  }
+  @keyframes deal{
+    0%{opacity:0; transform:translateY(-40px) rotate(-9deg) scale(.85)}
+    100%{opacity:1; transform:none}
+  }
+  .card .r{position:absolute; top:8px; left:10px; font-size:26px; font-weight:700; line-height:1}
+  .card .s{position:absolute; top:34px; left:11px; font-size:20px; line-height:1}
+  .card .c{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:50px}
+  .card .br{position:absolute; bottom:8px; right:10px; transform:rotate(180deg);
+            font-size:26px; font-weight:700; text-align:right}
+  .card.red{color:var(--red)}
+  .card.back{
+    background:
+      repeating-linear-gradient(45deg, #7a1d1d 0 8px, #631616 8px 16px);
+    border:5px solid #fffdf6;
+  }
+  .card.back::after{
+    content:"♠"; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    font-size:46px; color:rgba(255,253,246,.85);
+  }
+  .empty{color:var(--gold-dim); font-style:italic; font-size:14px; opacity:.7}
+
+  .divider{height:1px; background:linear-gradient(90deg,transparent,var(--gold-dim),transparent); opacity:.5}
+
+  .status{
+    position:absolute; bottom:14px; left:50%; transform:translateX(-50%);
+    text-align:center; min-width:60%;
+  }
+  .status .msg{font-size:16px; color:var(--cream); letter-spacing:1px}
+  .status .hand-num{font-size:11px; letter-spacing:4px; color:var(--gold-dim); text-transform:uppercase; margin-bottom:4px}
+
+  .result-banner{
+    position:absolute; inset:0; display:none; align-items:center; justify-content:center;
+    background:rgba(3,18,12,.78); backdrop-filter:blur(2px); z-index:5;
+  }
+  .result-banner.show{display:flex; animation:fade .4s both}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  .result-card{
+    text-align:center; padding:34px 56px; border:1px solid var(--gold);
+    border-radius:14px; background:rgba(0,0,0,.35); box-shadow:0 0 40px rgba(232,198,107,.25);
+  }
+  .result-card .big{font-size:34px; color:var(--gold); letter-spacing:3px; text-transform:uppercase}
+  .result-card .sub{margin-top:10px; font-size:14px; color:var(--cream); letter-spacing:1px}
+
+  /* ---- camera rail ---- */
+  .cams{
+    background:linear-gradient(180deg,#04150e,#02100a); border-left:1px solid var(--gold-dim);
+    padding:16px 14px; display:flex; flex-direction:column; gap:14px; overflow:hidden;
+  }
+  .cams h2{margin:0 0 2px; font-size:11px; letter-spacing:5px; color:var(--gold); text-transform:uppercase; text-align:center; opacity:.85}
+  .cam{display:flex; flex-direction:column; gap:5px;}
+  .cam .cap{font-size:10px; letter-spacing:3px; color:var(--gold-dim); text-transform:uppercase; display:flex; justify-content:space-between}
+  .cam .frame{
+    aspect-ratio:4/3; width:100%; border-radius:8px; overflow:hidden;
+    border:1px solid rgba(232,198,107,.25); background:#000;
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,.6);
+  }
+  .cam .frame img{width:100%; height:100%; object-fit:cover; display:block}
+  .dot{width:7px;height:7px;border-radius:50%;background:#3aa869;display:inline-block;vertical-align:middle;margin-left:6px;box-shadow:0 0 6px #3aa869}
+  .dot.off{background:#555;box-shadow:none}
+</style>
+</head>
+<body>
+<div class="table">
+  <div class="play">
+    <div class="brand">Blackjack<small>TECHIN 517 · live table</small></div>
+
+    <div class="side dealer">
+      <div class="label-row">
+        <span class="who">Dealer</span>
+        <span class="total" id="dealer-total">—</span>
+      </div>
+      <div class="hand" id="dealer-hand"><span class="empty">waiting…</span></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="side player">
+      <div class="hand" id="player-hand"><span class="empty">waiting…</span></div>
+      <div class="label-row">
+        <span class="who">Player</span>
+        <span class="total" id="player-total">—</span>
+      </div>
+    </div>
+
+    <div class="status">
+      <div class="hand-num" id="hand-num">Hand —</div>
+      <div class="msg" id="status-msg">Waiting for game to start…</div>
+    </div>
+
+    <div class="result-banner" id="result">
+      <div class="result-card">
+        <div class="big" id="result-big">—</div>
+        <div class="sub" id="result-sub"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUIT = {H:{g:"♥",red:true}, D:{g:"♦",red:true}, S:{g:"♠",red:false}, C:{g:"♣",red:false}};
+
+function parseCard(label){
+  // label like AH, KS, 10D, 7C
+  const sl = label.slice(-1).toUpperCase();
+  const rank = label.slice(0,-1).toUpperCase();
+  const s = SUIT[sl] || {g:"?",red:false};
+  return {rank, glyph:s.g, red:s.red};
+}
+
+function cardEl(label){
+  const c = parseCard(label);
+  const d = document.createElement("div");
+  d.className = "card" + (c.red ? " red" : "");
+  d.innerHTML =
+    `<div class="r">${c.rank}</div><div class="s">${c.glyph}</div>`+
+    `<div class="c">${c.glyph}</div><div class="br">${c.rank}<br>${c.glyph}</div>`;
+  return d;
+}
+function backEl(){
+  const d = document.createElement("div");
+  d.className = "card back";
+  return d;
+}
+
+let lastSig = {player:"", dealer:""};
+
+function renderHand(elId, cards, hidden, sig){
+  const el = document.getElementById(elId);
+  const newSig = cards.join(",") + "|" + (hidden||0);
+  if (newSig === lastSig[sig]) return;        // avoid re-animating unchanged hands
+  lastSig[sig] = newSig;
+  el.innerHTML = "";
+  if (!cards.length && !hidden){
+    el.innerHTML = '<span class="empty">waiting…</span>';
+    return;
+  }
+  cards.forEach(c => el.appendChild(cardEl(c)));
+  for (let i=0;i<(hidden||0);i++) el.appendChild(backEl());
+}
+
+function setTotal(elId, total, bust){
+  const el = document.getElementById(elId);
+  el.textContent = (total===null||total===undefined||total===0) ? "—" : total;
+  el.classList.toggle("bust", total>21);
+  el.classList.toggle("bj", total===21);
+}
+
+function apply(s){
+  document.getElementById("hand-num").textContent = "Hand " + (s.hand_num ?? "—");
+  document.getElementById("status-msg").textContent = s.status || "";
+
+  const d = s.dealer||{}, p = s.player||{};
+  renderHand("dealer-hand", d.cards||[], d.hidden||0, "dealer");
+  renderHand("player-hand", p.cards||[], 0, "player");
+  setTotal("dealer-total", d.total, true);
+  setTotal("player-total", p.total, true);
+
+  const banner = document.getElementById("result");
+  if (s.result){
+    document.getElementById("result-big").textContent = s.result;
+    const dt = d.total??0, pt = p.total??0;
+    document.getElementById("result-sub").textContent =
+      `Player ${pt}  vs  Dealer ${dt}`;
+    banner.classList.add("show");
+  } else {
+    banner.classList.remove("show");
+  }
+}
+
+// ---- live state via SSE, with polling fallback ----
+function connect(){
+  const es = new EventSource("/events");
+  es.onmessage = e => { try{ apply(JSON.parse(e.data)); }catch(_){} };
+  es.onerror = () => { es.close(); setTimeout(connect, 1500); };
+}
+connect();
+
+</script>
+</body>
+</html>

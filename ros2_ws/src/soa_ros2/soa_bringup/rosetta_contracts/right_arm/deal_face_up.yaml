@@ -1,0 +1,65 @@
+robot_type: soa
+fps: 30
+max_duration_s: 15.0
+
+observations:
+  - key: observation.images.wrist_right
+    topic: /right_follower/image_raw/compressed
+    type: sensor_msgs/msg/CompressedImage
+    image:
+      resize: [480, 640]
+    align: {strategy: hold, stamp: header}
+    qos: {reliability: best_effort, history: keep_last, depth: 10}
+
+  - key: observation.images.overhead
+    topic: /static_camera/overhead_cam/color/image_raw/compressed
+    type: sensor_msgs/msg/CompressedImage
+    image:
+      resize: [480, 640]
+    align: {strategy: hold, stamp: header}
+    qos: {reliability: best_effort, history: keep_last, depth: 10}
+
+  - key: observation.state
+    topic: /follower/joint_states
+    type: sensor_msgs/msg/JointState
+    selector:
+      names:
+        - position.right_shoulder_pan
+        - position.right_shoulder_lift
+        - position.right_elbow_flex
+        - position.right_wrist_flex
+        - position.right_wrist_roll
+        - position.right_gripper
+    align: {strategy: hold, stamp: header}
+    qos: {reliability: best_effort, history: keep_last, depth: 50}
+    decoder: soa_bringup.lerobot_norm_converters:decode_joint_state_norm
+
+actions:
+  - key: action
+    publish:
+      topic: /follower/right_arm_fwd_controller/commands
+      type: std_msgs/msg/Float64MultiArray
+      qos: {reliability: reliable, history: keep_last, depth: 10}
+    selector:
+      names:
+        - position.right_shoulder_pan
+        - position.right_shoulder_lift
+        - position.right_elbow_flex
+        - position.right_wrist_flex
+        - position.right_wrist_roll
+    encoder: soa_bringup.lerobot_norm_converters:encode_arm_fwd_norm
+    safety_behavior: hold
+
+  - key: action
+    publish:
+      topic: /follower/right_gripper_fwd_controller/commands
+      type: std_msgs/msg/Float64MultiArray
+      qos: {reliability: reliable, history: keep_last, depth: 10}
+    selector:
+      names:
+        - position.right_gripper
+    encoder: soa_bringup.lerobot_norm_converters:encode_gripper_fwd_norm
+    safety_behavior: hold
+
+recording:
+  storage: mcap
