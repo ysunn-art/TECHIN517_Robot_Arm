@@ -21,8 +21,6 @@ We evaluate the system as **three phases** (one per sub-system), **10 trials eac
 
 Timing means/standard deviations are over successful trials only. All 3 failures share a single root cause — overlapping cards confusing YOLO rank classification; no failures came from the arms, grippers, decision logic, or the VLA settlement policy.
 
-![Success rate by phase](success_rate.png)
-
 ## Setup instructions
 
 ### Prerequisites
@@ -84,6 +82,10 @@ sudo chmod a+rw /dev/video* /dev/ttyACM*
 
 ### 3. Start ROS 2 (Terminal 1)
 
+Required only for the waypoint-based game loop (`blackjack_game_loop.py`). The
+full game loop with the learned chip policy (`blackjack_game_loop_with_lerobot.py`)
+manages its own bringup, so you can skip this step for it.
+
 ```bash
 source ./ros2_ws/install/setup.bash
 ros2 launch soa_bringup bi_soa_bringup.launch.py controller:=jtc cameras:=false
@@ -109,4 +111,4 @@ Full game loop with learned chip policy:
 python3 ./scripts/blackjack_game_loop_with_lerobot.py
 ```
 
-**Controls:** press `0` to STAND / END, any other number key to HIT / DEAL.
+**Controls:** press `0` to STAND, any other number key to HIT.

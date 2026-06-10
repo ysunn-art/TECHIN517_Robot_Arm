@@ -16,10 +16,6 @@ exercising a distinct sub-system, with **10 trials per phase (30 total)**.
 | **Overall** | — | 30 | **27 / 30 (90%)** | — | — |
 
 Timing means/standard deviations are computed **over successful trials only**.
-Raw per-trial data: [`trials.csv`](trials.csv). Success-rate chart:
-[`success_rate.png`](success_rate.png).
-
-![Success rate by phase](success_rate.png)
 
 ---
 
@@ -126,10 +122,3 @@ is confirmed after the arm clears the frame.
   (left/center/right), **chip counts** (1–3), and **lighting** (dim/normal/bright).
   It succeeded in **10/10**, indicating the learned policy generalizes across those
   conditions where a scripted pick-and-place would need re-tuning.
-
----
-
-## Files
-- [`trials.csv`](trials.csv) — raw per-trial data (trial #, state, success/failure,
-  completion time, failure mode, observations).
-- [`success_rate.png`](success_rate.png) — success rate by phase.
